@@ -302,7 +302,7 @@ func main() { // {{{
 			" are collected in series but parallel with another series enp1s3f0 and enp1s3f1.",
 		)
 		pathGlob    arrayFlags
-		defaultPath = []string{"/sys/bus/pci/drivers/ixgbe/*:*/net/*"}
+		defaultPath = []string{"/sys/bus/pci/drivers/bnxt_en/*:*/net/*"}
 	)
 	flag.Var(&pathGlob, "devices",
 		"Shell glob that enumerate network devices to scrap. Repeatable.\n"+
