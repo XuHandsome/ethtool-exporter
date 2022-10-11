@@ -294,7 +294,7 @@ func main() { // {{{
 	var (
 		test     = flag.Bool("test", false, "test run - gather methrics and print them")
 		influx   = flag.Bool("test-influx", false, "single run - gather methrics and print them in influx line format")
-		addr     = flag.String("web.listen-address", "127.0.0.1:9992", "The address to listen on for HTTP requests.")
+		addr     = flag.String("web.listen-address", "0.0.0.0:9992", "The address to listen on for HTTP requests.")
 		debug    = flag.Bool("debug", false, "test run with debug printing (currently only iface glob match)")
 		parallel = flag.String("parallel", "^(.*)$", "regular expression that matches inteface name - "+
 			"Interfaces that differ in capture groups are collected in parallel.\n"+
