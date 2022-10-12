@@ -60,6 +60,16 @@ var (
 		"Receiver signal average optical power (W)",
 		transcieverLabels, nil,
 	)
+	transciever_txdbm = prometheus.NewDesc(
+		prometheus.BuildFQName(namespace, "", "transciever_txdbm"),
+		"Laser output power (dbM)",
+		transcieverLabels, nil,
+	)
+	transciever_rxdbm = prometheus.NewDesc(
+		prometheus.BuildFQName(namespace, "", "transciever_rxdbm"),
+		"Receiver signal average optical power (dbM)",
+		transcieverLabels, nil,
+	)
 )
 
 // }}}
@@ -95,6 +105,8 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	ch <- transciever_bias
 	ch <- transciever_txw
 	ch <- transciever_rxw
+	ch <- transciever_txdbm
+	ch <- transciever_rxdbm
 }
 
 func (e *Exporter) GetIfaces() ([]string, error) {
@@ -205,6 +217,8 @@ func (ch MetricChan) Emit(iface string, err error, tags map[string]string, metri
 		ch <- prometheus.MustNewConstMetric(transciever_bias, prometheus.GaugeValue, metrics.bias_mA*0.001, iface)
 		ch <- prometheus.MustNewConstMetric(transciever_txw, prometheus.GaugeValue, metrics.transmit_mW*0.001, iface)
 		ch <- prometheus.MustNewConstMetric(transciever_rxw, prometheus.GaugeValue, metrics.receive_mW*0.001, iface)
+		ch <- prometheus.MustNewConstMetric(transciever_txdbm, prometheus.GaugeValue, metrics.transmit_dBm, iface)
+		ch <- prometheus.MustNewConstMetric(transciever_rxdbm, prometheus.GaugeValue, metrics.receive_dBm, iface)
 	} else {
 		ch <- prometheus.MustNewConstMetric(transciever_present, prometheus.GaugeValue, 0, labels...)
 	}
