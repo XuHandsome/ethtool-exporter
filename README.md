@@ -1,24 +1,42 @@
 Ethtool Exporter
 ================
 
-This exporter uses ethtool syscall to collect transciever diagnosis from
-optical ethernet cards.  It does currently support only type
-ETH\_MODULE\_SFF\_8472 (0x2). It was tested only with `ixbge` network cards, so
-current default search path only include devices using this driver.
+基于[ethtool-exporter](https://github.com/ebikt/ethtool-exporter#readme)修改
 
-It has endpoints `/metrics` for prometheus and `/influx` for scraping by
-telegraph.
+### 新增特性
+--------------
+- [x] 支持博通网卡驱动`bnxt_en`, 并设为默认
+- [x] --brand 指定网卡厂商, 支持`broadcom` | `intel`
+- [x] 新增收发功率dbm单位指标: `transciever_txdbm` | `transciever_rxdbm`
 
-Influx format includes also dBm values for laser input and output power,
-they are simply calulated from mW values provided by the transciever.
+### 构建
+--------------
+```bash
+cd ethtool-exporter
+make
+ls -l ./dist/ethtool-exporter
+# 清理
+make clean
+```
 
-Implementation
+### 使用
+--------------
+```bash
+./ethtool-exporter -h
+```
+
+
+### 指标说明
 --------------
 
-`ethtool` utility reads whole eeprom, which is slow (~0.1s per transciever just
-reading the memory).  So I reimplemented `ethtool -m` reading and parsing in
-go, with following optimizations:
-  * Tags are cached by serial number of transciever, on each scraping is read
-    only serial number (16 bytes) and other tag values are read only first time,
-    then they are filled from cache.
-  * No alert limits for metrics are read, just the metrics themselves (10 bytes)
+| 指标                | 描述                          |
+| ------------------- | ----------------------------- |
+| transciever_present | 指标收集状态, **1**为收集成功 |
+| transciever_temp    | 传感器温度, 单位(C)           |
+| transciever_volt    | 传感器电压, 单位(V)           |
+| transciever_bias    | 偏置电流, 单位(A)             |
+| transciever_txw     | 发送信号平均光功率, 单位(W)   |
+| transciever_rxw     | 接收信号平均光功率, 单位(W)   |
+| transciever_txdbm   | 发送信号平均光功率, 单位(dBm) |
+| transciever_rxdbm   | 接收信号平均光功率, 单位(dBm) |
+
