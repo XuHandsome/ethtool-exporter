@@ -290,12 +290,31 @@ func (a *arrayFlags) Set(value string) error {
 
 // }}
 
+func GetDriverPath(brand string) []string {
+	const (
+		driversPath = "/sys/bus/pci/drivers/"
+		ifacesPath  = "/*:*/net/*"
+	)
+	// 需要维护网卡驱动映射map
+	brandCodeMap := map[string]string{
+		"broadcom": "bnxt_en",
+		"intel":    "ixgbe"}
+
+	driverCode, _ := brandCodeMap[brand]
+
+	driverPath := []string{driversPath + driverCode + ifacesPath}
+	return driverPath
+}
+
+// }}
+
 func main() { // {{{
 	var (
 		test     = flag.Bool("test", false, "test run - gather methrics and print them")
 		influx   = flag.Bool("test-influx", false, "single run - gather methrics and print them in influx line format")
 		addr     = flag.String("web.listen-address", "0.0.0.0:9992", "The address to listen on for HTTP requests.")
 		debug    = flag.Bool("debug", false, "test run with debug printing (currently only iface glob match)")
+		brand    = flag.String("brand", "broadcom", "Nic brand, which specifies the NIC driver")
 		parallel = flag.String("parallel", "^(.*)$", "regular expression that matches inteface name - "+
 			"Interfaces that differ in capture groups are collected in parallel.\n"+
 			"I.e. \"^(.*)\" means full parallel, \"^(.*[^0-9])\" means enp1s2f0 and enp1s2f1\n"+
@@ -309,6 +328,7 @@ func main() { // {{{
 			"Last component must resolve to name of network device. Default: "+strings.Join(defaultPath, ", "),
 	)
 	flag.Parse()
+	defaultPath = GetDriverPath(*brand)
 	if len(pathGlob) == 0 {
 		pathGlob = defaultPath
 	}
